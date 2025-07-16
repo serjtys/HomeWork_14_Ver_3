@@ -117,7 +117,7 @@ def test_iterator_with_products(sample_category):
     assert products[0].name == "Test Product"
 
 
-# Новые тесты для BaseProduct и ReprMixin
+# Тесты для BaseProduct и ReprMixin
 def test_base_product_is_abstract():
     assert issubclass(BaseProduct, ABC)
     with pytest.raises(TypeError):
@@ -145,3 +145,27 @@ def test_base_product_abstract_methods():
     assert hasattr(Product, "__add__")
     assert hasattr(Product, "new_product")
     assert hasattr(Product, "price")
+
+
+# Новые тесты для задания 17.1
+def test_product_zero_quantity():
+    with pytest.raises(ValueError) as excinfo:
+        Product("Zero", "Desc", 100.0, 0)
+    assert "Товар с нулевым количеством не может быть добавлен" in str(excinfo.value)
+
+
+def test_category_middle_price(sample_category, sample_product):
+    assert sample_category.middle_price() == 100.0
+
+
+def test_category_middle_price_empty():
+    empty_category = Category("Empty", "Desc", [])
+    assert empty_category.middle_price() == 0
+
+
+def test_category_middle_price_multiple_products():
+    p1 = Product("P1", "Desc", 100.0, 5)
+    p2 = Product("P2", "Desc", 200.0, 3)
+    p3 = Product("P3", "Desc", 300.0, 2)
+    category = Category("Test", "Desc", [p1, p2, p3])
+    assert category.middle_price() == 200.0
