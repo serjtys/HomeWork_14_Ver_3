@@ -1,9 +1,59 @@
-class Product:
+from abc import ABC, abstractmethod
+
+
+class ReprMixin:
+    """Миксин для вывода информации о создании объекта."""
+
+    def __repr__(self):
+        class_name = self.__class__.__name__
+        attributes = ", ".join(f"{k}={v!r}" for k, v in self.__dict__.items())
+        return f"{class_name}({attributes})"
+
+
+class BaseProduct(ABC):
+    """Абстрактный базовый класс для всех продуктов."""
+
+    @abstractmethod
+    def __init__(self, name: str, description: str, price: float, quantity: int):
+        """Инициализация продукта."""
+        pass
+
+    @abstractmethod
+    def __str__(self) -> str:
+        """Строковое представление продукта."""
+        pass
+
+    @abstractmethod
+    def __add__(self, other) -> float:
+        """Сложение продуктов."""
+        pass
+
+    @classmethod
+    @abstractmethod
+    def new_product(cls, product_data: dict, products_list=None):
+        """Создание нового продукта."""
+        pass
+
+    @property
+    @abstractmethod
+    def price(self) -> float:
+        """Цена продукта."""
+        pass
+
+    @price.setter
+    @abstractmethod
+    def price(self, new_price: float):
+        """Установка цены."""
+        pass
+
+
+class Product(BaseProduct, ReprMixin):
     def __init__(self, name: str, description: str, price: float, quantity: int):
         self.name = name
         self.description = description
         self._price = price
         self.quantity = quantity
+        print(repr(self))
 
     def __str__(self):
         return f"{self.name}, {self.price} руб. Остаток: {self.quantity} шт."

@@ -1,8 +1,9 @@
+from abc import ABC
 from unittest.mock import patch
 
 import pytest
 
-from src.products import Category, LawnGrass, Product, Smartphone
+from src.products import BaseProduct, Category, LawnGrass, Product, Smartphone
 
 
 # Фикстуры
@@ -26,6 +27,7 @@ def sample_category(sample_product):
     return Category("Test Category", "Test Category Description", [sample_product])
 
 
+# Тесты для Product
 def test_product_price_setter_positive(sample_product):
     sample_product.price = 150.0
     assert sample_product.price == 150.0
@@ -57,7 +59,7 @@ def test_new_product_with_duplicate():
     assert product.price == 60.0
 
 
-# Тесты для новых классов (Smartphone и LawnGrass)
+# Тесты для Smartphone и LawnGrass
 def test_smartphone_creation(sample_smartphone):
     assert sample_smartphone.memory == 256
     assert isinstance(sample_smartphone, Product)
@@ -79,7 +81,7 @@ def test_add_different_types(sample_smartphone, sample_lawn_grass):
         sample_smartphone + sample_lawn_grass
 
 
-# Тесты для Category (старые + новые)
+# Тесты для Category
 def test_empty_category():
     category = Category("Empty", "Desc", [])
     assert str(category) == "Empty, количество продуктов: 0 шт."
@@ -113,3 +115,33 @@ def test_iterator_with_products(sample_category):
     products = list(sample_category)
     assert len(products) == 1
     assert products[0].name == "Test Product"
+
+
+# Новые тесты для BaseProduct и ReprMixin
+def test_base_product_is_abstract():
+    assert issubclass(BaseProduct, ABC)
+    with pytest.raises(TypeError):
+        BaseProduct("Test", "Desc", 100.0, 10)
+
+
+def test_product_inherits_from_base_product():
+    assert issubclass(Product, BaseProduct)
+
+
+def test_repr_mixin(sample_product):
+    repr_str = repr(sample_product)
+    assert "Product" in repr_str
+    assert "name='Test Product'" in repr_str
+    assert "description='Test Description'" in repr_str
+    assert "_price=100.0" in repr_str
+    assert "quantity=10" in repr_str
+
+
+def test_base_product_abstract_methods():
+    """Проверка, что все абстрактные методы реализованы в дочерних классах."""
+    assert issubclass(Product, BaseProduct)
+    assert hasattr(Product, "__init__")
+    assert hasattr(Product, "__str__")
+    assert hasattr(Product, "__add__")
+    assert hasattr(Product, "new_product")
+    assert hasattr(Product, "price")
