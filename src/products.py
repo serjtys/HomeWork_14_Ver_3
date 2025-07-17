@@ -49,6 +49,8 @@ class BaseProduct(ABC):
 
 class Product(BaseProduct, ReprMixin):
     def __init__(self, name: str, description: str, price: float, quantity: int):
+        if quantity == 0:
+            raise ValueError("Товар с нулевым количеством не может быть добавлен")
         self.name = name
         self.description = description
         self._price = price
@@ -160,6 +162,13 @@ class Category:
     @property
     def products(self):
         return "\n".join(str(product) for product in self.__products)
+
+    def middle_price(self):
+        try:
+            total = sum(product.price for product in self.__products)
+            return total / len(self.__products)
+        except ZeroDivisionError:
+            return 0
 
 
 class CategoryIterator:
